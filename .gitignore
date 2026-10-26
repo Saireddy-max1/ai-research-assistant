@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.env
+.env.*
+!.env.example
+data/chroma/
+
+# Local documents and vector database
+data/documents/
+data/vector_store
+
+# Manual test scripts
+app/rag/test_*.py
+app/test_llm.py
+
+ai-research-assistent/
+
+ai-research-assistent/
