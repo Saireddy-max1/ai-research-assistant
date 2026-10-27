@@ -51,7 +51,7 @@ DB_PATH = "./data/chroma"
 client = chromadb.PersistentClient(path=DB_PATH)
 
 collection = client.get_or_create_collection(
-    name="research_documents_v2"
+    name="research_documents_gemini"
 )
 
 
@@ -88,3 +88,9 @@ def search_documents(
 
 def delete_document(chunk_id: str):
     collection.delete(ids=[chunk_id])
+
+def delete_source_documents(source_id: str):
+    """Delete all chunks belonging to one uploaded document."""
+    collection.delete(
+        where={"source_id": source_id}
+    )

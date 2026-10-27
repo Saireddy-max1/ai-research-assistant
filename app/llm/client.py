@@ -1,24 +1,31 @@
 
-from ollama import chat
+import os
 
-MODEL_NAME = "qwen2.5:3b"
+from dotenv import load_dotenv
+from google import genai
+
+load_dotenv()
+
+MODEL_NAME = "gemini-3.5-flash-lite"
 
 
 def ask_llm(question: str) -> str:
-    response = chat(
+    api_key = os.getenv("GEMINI_API_KEY")
+
+    if not api_key:
+        raise ValueError(
+            "GEMINI_API_KEY is missing. Add it to your .env file "
+            "or configure it in your deployment secrets."
+        )
+
+    client = genai.Client(api_key=api_key)
+
+    response = client.models.generate_content(
         model=MODEL_NAME,
-        messages=[
-            {
-                "role": "user",
-                "content": question + "\n/no_think"
-            }
-        ],
-        think=False,
-        keep_alive="10m",
-        options={
-            "num_predict": 128,
-            "temperature": 0.2
-        }
+        contents=question,
     )
 
-    return response.message.content.strip()
+    if not response.text:
+        raise RuntimeError("Gemini returned an empty response.")
+
+    return response.text.strip()
