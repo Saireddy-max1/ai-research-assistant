@@ -1,6 +1,5 @@
-streamlit
+﻿streamlit
 google-genai
 python-dotenv
 chromadb
 pypdf
-ollama
