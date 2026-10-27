@@ -1,3 +1,10 @@
+﻿import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 import hashlib
 import os
@@ -17,11 +24,11 @@ from app.rag.vector_store import delete_source_documents
 
 st.set_page_config(
     page_title="Research PDF Assistant",
-    page_icon="📚",
+    page_icon="ðŸ“š",
     layout="centered",
 )
 
-st.title("📚 Research PDF Assistant")
+st.title("ðŸ“š Research PDF Assistant")
 st.caption("Upload a PDF and ask questions about its contents.")
 
 
@@ -144,11 +151,11 @@ for message in st.session_state.messages:
 
         # Show citations again when displaying previous answers.
         if message["role"] == "assistant" and message.get("sources"):
-            with st.expander("📚 Sources"):
+            with st.expander("ðŸ“š Sources"):
                 for source in message["sources"]:
                     st.markdown(
                         f"- **{source['filename']}** "
-                        f"— Page {source['page']}"
+                        f"â€” Page {source['page']}"
                     )
 
 
@@ -189,11 +196,11 @@ if question:
                 st.markdown(answer)
 
                 if sources:
-                    with st.expander("📚 Sources"):
+                    with st.expander("ðŸ“š Sources"):
                         for source in sources:
                             st.markdown(
                                 f"- **{source['filename']}** "
-                                f"— Page {source['page']}"
+                                f"â€” Page {source['page']}"
                             )
 
                 st.session_state.messages.append(
@@ -206,3 +213,4 @@ if question:
 
             except Exception as error:
                 st.error(f"Something went wrong: {error}")
+
