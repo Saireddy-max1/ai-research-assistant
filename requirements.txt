@@ -1,5 +1,6 @@
 ﻿streamlit
-google-genai
-python-dotenv
 chromadb
 pypdf
+sentence-transformers
+ollama
+python-dotenv

@@ -1,31 +1,29 @@
+﻿import os
 
-import os
+from ollama import Client
 
-from dotenv import load_dotenv
-from google import genai
-
-load_dotenv()
-
-MODEL_NAME = "gemini-3.5-flash-lite"
+MODEL_NAME = "qwen3:4b"
 
 
 def ask_llm(question: str) -> str:
-    api_key = os.getenv("GEMINI_API_KEY")
+    """Generate an answer using an Ollama server."""
 
-    if not api_key:
-        raise ValueError(
-            "GEMINI_API_KEY is missing. Add it to your .env file "
-            "or configure it in your deployment secrets."
-        )
+    host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+    client = Client(host=host)
 
-    client = genai.Client(api_key=api_key)
-
-    response = client.models.generate_content(
+    response = client.chat(
         model=MODEL_NAME,
-        contents=question,
+        messages=[
+            {
+                "role": "user",
+                "content": question,
+            }
+        ],
     )
 
-    if not response.text:
-        raise RuntimeError("Gemini returned an empty response.")
+    answer = response.message.content
 
-    return response.text.strip()
+    if not answer:
+        raise RuntimeError("Ollama returned an empty response.")
+
+    return answer.strip()

@@ -1,13 +1,15 @@
-
-from app.rag.loader import load_pdf
+﻿from app.rag.loader import load_pdf
 from app.rag.cleaner import clean_text
 from app.rag.chunker_v2 import chunk_pages
-from app.rag.embeddings import create_embedding
+from app.rag.embeddings import embed_text
 from app.rag.vector_store import add_document
 
 
-def index_pdf(pdf_path: str, source_id: str | None = None,
-              source_name: str | None = None):
+def index_pdf(
+    pdf_path: str,
+    source_id: str | None = None,
+    source_name: str | None = None,
+):
     print("Loading PDF...")
 
     pages = load_pdf(pdf_path)
@@ -19,12 +21,14 @@ def index_pdf(pdf_path: str, source_id: str | None = None,
     chunks = chunk_pages(pages)
     print(f"Created {len(chunks)} chunks.")
 
-    for i, chunk in enumerate(chunks, start=1):
-        embedding = create_embedding(chunk["text"])
+    document_source_id = source_id or pdf_path
 
-        # Preserve compatibility with existing indexing calls.
-        document_source_id = source_id or pdf_path
-        unique_chunk_id = f"{document_source_id}_{chunk['chunk_id']}"
+    for i, chunk in enumerate(chunks, start=1):
+        embedding = embed_text(chunk["text"])
+
+        unique_chunk_id = (
+            f"{document_source_id}_{chunk['chunk_id']}"
+        )
 
         metadata = {
             "source": source_name or pdf_path,

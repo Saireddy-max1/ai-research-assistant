@@ -1,32 +1,41 @@
+﻿import streamlit as st
+from sentence_transformers import SentenceTransformer
 
-import os
-
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types
-
-load_dotenv()
-
-EMBEDDING_MODEL = "gemini-embedding-2"
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 
-def create_embedding(text: str) -> list[float]:
-    api_key = os.getenv("GEMINI_API_KEY")
+@st.cache_resource
+def get_embedding_model():
+    """Load the embedding model once."""
+    return SentenceTransformer(MODEL_NAME, device="cpu")
 
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY is missing.")
 
-    client = genai.Client(api_key=api_key)
+def embed_text(text: str) -> list[float]:
+    """Convert one text into an embedding vector."""
+    model = get_embedding_model()
 
-    response = client.models.embed_content(
-        model=EMBEDDING_MODEL,
-        contents=text,
-        config=types.EmbedContentConfig(
-            output_dimensionality=768
-        ),
+    vector = model.encode(
+        text,
+        normalize_embeddings=True,
+        convert_to_numpy=True,
     )
 
-    if not response.embeddings:
-        raise RuntimeError("Gemini returned no embedding.")
+    return vector.tolist()
 
-    return response.embeddings[0].values
+
+def embed_texts(texts: list[str]) -> list[list[float]]:
+    """Convert multiple texts into embedding vectors."""
+    if not texts:
+        return []
+
+    model = get_embedding_model()
+
+    vectors = model.encode(
+        texts,
+        batch_size=16,
+        normalize_embeddings=True,
+        convert_to_numpy=True,
+        show_progress_bar=False,
+    )
+
+    return vectors.tolist()
